@@ -21,13 +21,18 @@ public class PointSet {
     private ArrayList<Point> pointList;
     private String pointType;
     
-    public PointSet(String fileLocation) throws IOException{
+    private String[] destNames;
+    private double[] latitude;
+    private double[] longitude;
+
+    public PointSet(InputStream fis) throws IOException{
         this.pointList = new ArrayList<>();
+
+        BufferedReader br = null;
         
-	FileInputStream fis = new FileInputStream(fileLocation);
- 
+        try{
 	//Construct BufferedReader from InputStreamReader
-	BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+	br = new BufferedReader(new InputStreamReader(fis));
  
 	String line = null;
         int count = 0;
@@ -40,17 +45,28 @@ public class PointSet {
                     
                     double tempLat = Double.parseDouble(segments[1]);
                     double tempLong = Double.parseDouble(segments[2]);
-                    addPoint(segments[0],tempLat,tempLong);                   
-                    
+                    addPoint(segments[0],tempLat,tempLong);                                 
                 }
-                count++;
+                count++;                
 	}
- 
-	br.close();
+        destNames = new String[count];
+        latitude = new double[count];
+        longitude = new double[count];
+        for(int ii = 0; ii<count-1; ii++){
+            destNames[ii] = pointList.get(ii).getName();
+            latitude[ii] = pointList.get(ii).getLatitude();
+            longitude[ii] = pointList.get(ii).getLongitude();
+        }        
+        
+        } catch(IOException e){
+        
+        }
+        finally{
+            br.close();
+            fis.close();
+        }         	
     }
-    
-
-    
+     
     private void addPoint(String name, double latitude, double longitude){
         this.pointList.add(new Point(name,latitude,longitude));
     }
@@ -61,6 +77,18 @@ public class PointSet {
     
     public ArrayList getPoints(){
         return this.pointList;
+    }
+    
+    public String[] getDestNames(){
+        return this.destNames;
+    }
+    
+    public double[] getLatitudes(){
+        return this.latitude;
+    }
+    
+    public double[] getLongitudes(){
+        return this.longitude;
     }
     
     public String toString(){
